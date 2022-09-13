@@ -69,7 +69,13 @@ public class NoPomo {
         }
 
     }
-
+    /**
+     * 
+     * @param n String #1
+     * @param comparee String #2
+     * @return True if String #1 and String #2 are same (discounting whitespace and capitilization)
+     *         False if otherwise.
+     */
     public static Boolean checkString(String n, String comparee){
         
         String toCheck = n.toLowerCase().trim();
@@ -80,21 +86,35 @@ public class NoPomo {
         return false;
     }
 
+    /**
+     * Runs 25 minute workperiod
+     */
     public static void runWorkPeriod(){
         runTimer(25, 0);
 
     }
 
+    /** 
+     * Runs 5 minute coffee break
+     */
     public static void runCoffeeBreak(){
         runTimer(5,0);
 
     }
 
+    /**
+     * Runs 30 minute lunch break
+     */
     public static void runLunchBreak(){
         runTimer(30,0);
     }
 
-    public static void runTimer(int mins, int secs){
+        /**
+         * Starts and runs a timer that lasts mins:secs, displays on terminal
+         * @param mins 
+         * @param secs
+         */
+        public static void runTimer(int mins, int secs){
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         long minutes = 0;
@@ -117,6 +137,11 @@ public class NoPomo {
         }
     }
 
+    /**
+     * Clears terminal screen
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public static void clearScreen()throws IOException, InterruptedException {
         new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();  
     }
