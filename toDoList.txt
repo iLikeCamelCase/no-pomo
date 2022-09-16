@@ -3,8 +3,16 @@ To implement:
 1. Static tracker for amount of pomodoros completed, should remain visible always
 2. Options to pause/reset timer while it's running
 3. Options to leave the program
+5. Fix timer when seconds are <10 eg. 10:03 instead of 10:3, same with mins
+(DONE) Beep on timer completion
+(DONE) Speaking of the timer, its garbage, come up with a new one
 
 For the future:
 
 1. Persistent storage to track amount of pomodoros completed
 2. Visual representation of above ^, show productivity over time.
+
+Bugs:
+
+1. When you minimize terminal window quickly and the cursor moves down a line
+it fucks everything up has to do with the "\r" you're using
