@@ -1,16 +1,21 @@
 import java.io.Console;
 import java.util.Date;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.io.File;
+import javax.sound.sampled.*;
 
 /**
  * NoPomo --- program to run a pomodoro timer in a terminal
  * @author iLikeCamelCase
  */
 public class NoPomo {
-    public static void main(String[] args)throws IOException, InterruptedException{
+    public static void main(String[] args)throws IOException, InterruptedException,
+                                                 MalformedURLException, UnsupportedAudioFileException, 
+                                                 LineUnavailableException{
 
         Console console = System.console();
-
+        userData user = new userData();
         if (console == null) {
             System.out.println("Console is not available to current process");
             return;
@@ -21,26 +26,26 @@ public class NoPomo {
         String response = console.readLine();
 
         if (checkString(response, "y")){ // run pomodoro session
-            int pomoCounter = 0;
+            
             clearScreen();
             while (true){
             // check to begin work timer (25 mins) or exit
             response = console.readLine("Begin Pomodoro? Y/N \n \n");
             if (checkString(response, "y")){
                 clearScreen();
-                runWorkPeriod();
-                pomoCounter++; 
+                runWorkPeriod(user.getPomoCount());
+                user.addPomoCount(); 
                 clearScreen();
-                System.out.println(pomoCounter + " Pomodoro completed.\n");
+                System.out.println(user.getPomoCount() + " Pomodoro completed.\n");
             }
 
             // check to begin coffee break (if pomo counter < 4) or exit
-            if (pomoCounter < 4){
+            if (user.getPomoCount() < 4){
                 response = console.readLine("Begin Coffee Break? Y/N\n\n");
                 if (checkString(response, "y")){
                     // pause option
                     clearScreen();
-                    runCoffeeBreak();
+                    runCoffeeBreak(user.getPomoCount());
                     clearScreen();
                     System.out.println("Your break is over. Back to work... \n");
                         // continue option
@@ -50,16 +55,16 @@ public class NoPomo {
             }
 
             // if pomo counter 4 check to begin lunch break or exit
-            else if (pomoCounter == 4){
+            else if (user.getPomoCount() == 4){
                 System.out.println("You have completed a set. \n");
                 response = console.readLine("Begin Lunch Break? Y/N\n\n");
                 if (checkString(response, "y")){
                     clearScreen();
-                    runLunchBreak();
+                    runLunchBreak(user.getPomoCount());
                     clearScreen();
                     System.out.println("Your lunch break is over. Back to work...");
 
-                    pomoCounter = 0;
+                    user.resetPomoCount();
                 }
             }
                 
@@ -86,27 +91,28 @@ public class NoPomo {
         return false;
     }
 
+
     /**
      * Runs 25 minute workperiod
      */
-    public static void runWorkPeriod(){
-        runTimer(25, 0);
+    public static void runWorkPeriod(int pomos){
+        runTimer(25, 0, pomos);
 
     }
 
     /** 
      * Runs 5 minute coffee break
      */
-    public static void runCoffeeBreak(){
-        runTimer(5,0);
+    public static void runCoffeeBreak(int pomos){
+        runTimer(5,0,pomos);
 
     }
 
     /**
      * Runs 30 minute lunch break
      */
-    public static void runLunchBreak(){
-        runTimer(30,0);
+    public static void runLunchBreak(int pomos){
+        runTimer(30,0,pomos);
     }
 
         /**
@@ -114,7 +120,8 @@ public class NoPomo {
          * @param mins 
          * @param secs
          */
-        public static void runTimer(int mins, int secs){
+        /*
+    public static void runTimer(int mins, int secs, int pomos) {
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         long minutes = 0;
@@ -122,20 +129,51 @@ public class NoPomo {
         int lastSecond = 99;
         long goal = ((mins * 60) + secs) * 1000;
 
-
-        while (elapsedTime < goal){
+        System.out.println();
+        while (elapsedTime < goal) {
             elapsedTime = (new Date()).getTime() - startTime;
 
             minutes = (elapsedTime / 1000) / 60;
-            seconds = (int)((elapsedTime / 1000) % 60);
-            
+            seconds = (int) ((elapsedTime / 1000) % 60);
 
-            if (seconds != lastSecond){
-                System.out.println(minutes+":"+seconds);
+            if (seconds != lastSecond) {
+                System.out.print("  " + minutes + ":" + seconds + "\r");
                 lastSecond = seconds;
             }
         }
-    }
+        playSound();
+        }
+        */
+
+        public static void runTimer(int mins, int secs, int pomos){
+            int goal = (mins * 60) + secs;
+            mins = 0;
+            secs = 0;
+            String strMins = "";
+            String strSecs = "";
+
+            for (int i = 0; i < goal; i++){
+                if (mins < 10){
+                    strMins = "0" + String.valueOf(mins);
+                }
+                else {strMins = String.valueOf(mins);}
+
+                if (secs < 10){
+                    strSecs = "0" + String.valueOf(secs);
+                }
+                else {strSecs = String.valueOf(secs);}
+                System.out.print("  Elapsed: "+strMins+":"+strSecs+"\r");
+                secs++;
+                if (secs == 60){
+                    secs = 0;
+                    mins++;
+                }
+                try{Thread.sleep(1000);}
+                catch(Exception interrupException){
+                    System.out.println("Something went wrong...  :/");
+                }
+            }
+        }
 
     /**
      * Clears terminal screen
@@ -144,6 +182,21 @@ public class NoPomo {
      */
     public static void clearScreen()throws IOException, InterruptedException {
         new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();  
+        
+        
+        
     }
 
+    public static void playSound(){
+        try{
+            File soundFile = new File("./media/Alarm10.wav");
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile.toURI().toURL());  
+            Clip soundClip = AudioSystem.getClip();
+            soundClip.open(audioIn);
+            soundClip.start();
+        }
+        catch(Exception MalformedURLException){
+
+        }
+    }
 }
