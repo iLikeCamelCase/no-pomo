@@ -1,9 +1,12 @@
 import java.io.Console;
-import java.util.Date;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.rmi.server.UID;
 import java.io.File;
 import javax.sound.sampled.*;
+import java.util.ArrayList;
+
+
 
 /**
  * NoPomo --- program to run a pomodoro timer in a terminal
@@ -15,12 +18,18 @@ public class NoPomo {
                                                  LineUnavailableException{
 
         Console console = System.console();
+
+        ArrayList<String[]> userDataList = new ArrayList<String[]>(persistentStorage.readUserData());
+
         userData user = new userData();
         if (console == null) {
             System.out.println("Console is not available to current process");
             return;
         }
         clearScreen();
+
+        // add login here
+
         System.out.println(" Pomodoro Timer \n \n Ready to get to work? Y/N\n");
 
         String response = console.readLine();
@@ -115,65 +124,36 @@ public class NoPomo {
         runTimer(30,0,pomos);
     }
 
-        /**
-         * Starts and runs a timer that lasts mins:secs, displays on terminal
-         * @param mins 
-         * @param secs
-         */
-        /*
-    public static void runTimer(int mins, int secs, int pomos) {
-        long startTime = System.currentTimeMillis();
-        long elapsedTime = 0;
-        long minutes = 0;
-        int seconds = 0;
-        int lastSecond = 99;
-        long goal = ((mins * 60) + secs) * 1000;
 
-        System.out.println();
-        while (elapsedTime < goal) {
-            elapsedTime = (new Date()).getTime() - startTime;
+    public static void runTimer(int mins, int secs, int pomos){
+        int goal = (mins * 60) + secs;
+        mins = 0;
+        secs = 0;
+        String strMins = "";
+        String strSecs = "";
 
-            minutes = (elapsedTime / 1000) / 60;
-            seconds = (int) ((elapsedTime / 1000) % 60);
+        for (int i = 0; i < goal; i++){
+            if (mins < 10){
+                strMins = "0" + String.valueOf(mins);
+            }
+            else {strMins = String.valueOf(mins);}
 
-            if (seconds != lastSecond) {
-                System.out.print("  " + minutes + ":" + seconds + "\r");
-                lastSecond = seconds;
+            if (secs < 10){
+                strSecs = "0" + String.valueOf(secs);
+            }
+            else {strSecs = String.valueOf(secs);}
+            System.out.print("  Elapsed: "+strMins+":"+strSecs+"\r");
+            secs++;
+            if (secs == 60){
+                secs = 0;
+                mins++;
+            }
+            try{Thread.sleep(1000);}
+            catch(Exception interrupException){
+                System.out.println("Something went wrong...  :/");
             }
         }
-        playSound();
-        }
-        */
-
-        public static void runTimer(int mins, int secs, int pomos){
-            int goal = (mins * 60) + secs;
-            mins = 0;
-            secs = 0;
-            String strMins = "";
-            String strSecs = "";
-
-            for (int i = 0; i < goal; i++){
-                if (mins < 10){
-                    strMins = "0" + String.valueOf(mins);
-                }
-                else {strMins = String.valueOf(mins);}
-
-                if (secs < 10){
-                    strSecs = "0" + String.valueOf(secs);
-                }
-                else {strSecs = String.valueOf(secs);}
-                System.out.print("  Elapsed: "+strMins+":"+strSecs+"\r");
-                secs++;
-                if (secs == 60){
-                    secs = 0;
-                    mins++;
-                }
-                try{Thread.sleep(1000);}
-                catch(Exception interrupException){
-                    System.out.println("Something went wrong...  :/");
-                }
-            }
-        }
+    }
 
     /**
      * Clears terminal screen
@@ -182,14 +162,11 @@ public class NoPomo {
      */
     public static void clearScreen()throws IOException, InterruptedException {
         new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();  
-        
-        
-        
     }
 
     public static void playSound(){
         try{
-            File soundFile = new File("./media/Alarm10.wav");
+            File soundFile = new File("./data/Alarm10.wav");
             AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile.toURI().toURL());  
             Clip soundClip = AudioSystem.getClip();
             soundClip.open(audioIn);
@@ -199,4 +176,20 @@ public class NoPomo {
 
         }
     }
+    /*
+     * @param user name of user
+     * @param userDataList list of userdata to check for user in
+     * @return userData() or null if not found
+     */
+    public static userData returnUser(String user, ArrayList<String[]> userDataList){
+        for (int i = 0; i < userDataList.size(); i++){
+            if (user.trim() == userDataList.get(i)[0]){
+                String tempList[] = userDataList.get(i);
+                return new userData(tempList[0].trim(), Integer.parseInt(tempList[1].trim()));
+            }
+        }
+        return null;
+    }
+
+        
 }

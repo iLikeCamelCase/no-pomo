@@ -1,8 +1,13 @@
 public class userData {
     int pomoCounter;
+    String userName;
 
-    public userData(){
-        pomoCounter =0;
+    public userData(String name){
+        this(name, 0);
+    }
+    public userData(String name, int numPomos){
+        pomoCounter = numPomos;
+        userName = name;
     }
 
     public int getPomoCount(){
