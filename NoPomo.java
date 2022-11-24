@@ -21,7 +21,8 @@ public class NoPomo {
 
         ArrayList<String[]> userDataList = new ArrayList<String[]>(persistentStorage.readUserData());
 
-        userData user = new userData();
+        userData user = new userData("temp user", 0);
+
         if (console == null) {
             System.out.println("Console is not available to current process");
             return;
@@ -29,7 +30,8 @@ public class NoPomo {
         clearScreen();
 
         // add login here
-
+        
+        
         System.out.println(" Pomodoro Timer \n \n Ready to get to work? Y/N\n");
 
         String response = console.readLine();
@@ -106,6 +108,7 @@ public class NoPomo {
      */
     public static void runWorkPeriod(int pomos){
         runTimer(25, 0, pomos);
+        playSound();
 
     }
 
@@ -114,6 +117,7 @@ public class NoPomo {
      */
     public static void runCoffeeBreak(int pomos){
         runTimer(5,0,pomos);
+        playSound();
 
     }
 
@@ -122,6 +126,7 @@ public class NoPomo {
      */
     public static void runLunchBreak(int pomos){
         runTimer(30,0,pomos);
+        playSound();
     }
 
 
